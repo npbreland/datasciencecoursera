@@ -1,0 +1,8 @@
+corr <- function(directory, threshold = 0) {
+
+  complete_cases <- complete(directory)
+  above_threshold <- subset(complete_cases, nobs > threshold)
+  above_threshold
+
+
+}
