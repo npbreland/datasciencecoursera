@@ -1,0 +1,27 @@
+```{r}
+log(-1) # produces warning
+
+# use invisible to prevent returned object from printing
+printmessage <- function(x) {
+  invisible(x)
+}
+```
+
+`traceback`
+
+```{r}
+mean(x)
+lm(y - x)
+traceback()
+```
+
+`debug`
+```{r}
+debug(lm)
+```
+
+`recover`
+```{r}
+options(error = recover)
+read.csv("nosuchfile")
+```

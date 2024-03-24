@@ -1,0 +1,111 @@
+---
+title: "Loop functions"
+output: html_document
+---
+
+These functions are good as shortcuts, especially on the command line for
+exploratory work, so you don't have to write a loop.
+
+`lapply` is like a map
+```{r}
+x <- list(a = 1:5, b = rnorm(1))
+lapply(x, mean)
+
+x <- 1:4
+lapply(x, runif, min = 0, max = 10)
+
+x <- list(a = matrix(1:4, 2, 2), b = matrix(1:6, 3, 2))
+x
+lapply(x, function(elt) elt[, 1]) # returns first column of each matrix
+```
+
+`sapply` is like `lapply` but it tries to simplify the list
+```{r}
+x <- list(a = 1:5, b = rnorm(1))
+simplified <- sapply(x, mean)
+simplified
+class(simplified)
+```
+
+`apply` is *a bit* like reduce - it can summarize/collapse a dimension
+
+```{r}
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 2, mean) # collapses the rows to get the mean of each column
+apply(x, 1, mean) # collapses the columns to get the mean of each row
+```
+
+**NOTE:** better to use `rowMeans` and `colMeans` for the above, as they are
+optimized
+
+```{r} 
+x <- matrix(rnorm(200), 20, 10)
+apply(x, 1, quantile, probs = c(0.25, 0.75))
+
+```
+
+```{r} 
+a <- array(rnorm(2 * 2 * 10), c(2, 2, 10))
+apply(a, c(1, 2), mean)
+rowMeans(a, dims = 2)
+```
+
+`mapply` is a "multivariate" version of apply. It allows you to apply a function
+over multiple arguments in parallel, and they can refer to one another.
+
+```{r}
+mapply(rep, 1:4, 4:1)
+```
+
+```{r}
+noise <- function(n, mean, sd) {
+  rnorm(n, mean, sd)
+}
+# using mapply you can vectorize non-vector functions
+mapply(noise, 1:5, 1:5, 2)
+```
+
+`tapply` is applies function over subsets of a vector
+
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+f
+
+tapply(x, f, mean)
+tapply(x, f, mean, simplify = FALSE)
+tapply(x, f, range)
+```
+
+`split` not a loop function - but useful to know in this context
+splits vector into groups - like `partition` in a Laravel collection
+```{r}
+x <- c(rnorm(10), runif(10), rnorm(10, 1))
+f <- gl(3, 10)
+
+split(x, f)
+
+# common to use split followed by lapply - but you could have used tapply
+lapply(split(x, f), mean)
+
+library(datasets)
+head(airquality)
+
+s <- split(airquality, airquality$Month)
+lapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")]))
+sapply(s, function(x) colMeans(x[, c("Ozone", "Solar.R", "Wind")], na.rm = TRUE))
+```
+
+## Splitting on more than one level
+
+```{r}
+x <- rnorm(10)
+f1 <- gl(2, 5)
+f2 <- gl(5, 2)
+
+f1
+f2
+
+interaction(f1, f2)
+str(split(x, list(f1, f2), drop = TRUE))
+```

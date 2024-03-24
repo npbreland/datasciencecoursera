@@ -1,0 +1,101 @@
+# Simulation and Profiling
+
+## Str
+str function shows structure
+very useful
+
+```{r}
+library(datasets)
+s <- split(airquality, airquality$Month)
+str(s)
+```
+
+## Simulation
+
+### Generating Random Numbers
+
+* `rnorm` - generate random Normal variates with a given mean and standard deviation
+* `dnorm` - evalute the Normal probability density (with a given mean/SD) at a point (or vector of points)
+* `pnorm` - evaluate the cumulative distribution function for a Normal distribution
+* `rpois` - random Poisson variates with a given rate
+
+Probability distribution functions usually have four functions. By prefix:
+- d: density
+- r: random number generation
+- p: cumulative distribution
+- q: quantile function
+
+```{r} 
+# make sure to set seed if you need reproducibility! - which you will during 
+# simulation
+set.seed(1)
+x <- rnorm(10)
+x
+x <- rnorm(10, 20, 2)
+x
+summary(x)
+```
+
+#### Poisson
+```{r}
+
+rpois(10, 1)
+
+ppois(2, 2)
+```
+
+### Simulating a Linear Model
+
+#### From a normal distribution
+```{r}
+set.seed(20)
+x <- rnorm(100)
+e <- rnorm(100, 0, 2)
+
+y <- 0.5 + 2 * x + e
+summary(y)
+plot(x, y)
+```
+
+#### From a binomial distribution
+```{r}
+set.seed(20)
+x <- rbinom(100, 1, 0.5)
+e <- rnorm(100, 0, 2)
+
+y <- 0.5 + 2 * x + e
+summary(y)
+plot(x, y)
+```
+
+#### From a Poisson distribution
+```{r}
+set.seed(1)
+x <- rnorm(100)
+log.mu <- 0.5 + 0.3 * x
+y <- rpois(100, exp(log.mu))
+summary(y)
+plot(x, y)
+```
+
+### Sampling
+```{r}
+set.seed(1)
+sample(1:10, 4)
+
+sample(1:10)
+sample(1:10, replace = TRUE) # items can be repeated
+```
+
+## Profiling
+
+can use `system.time`, just returns user (cpu) time and elapsed time
+
+can use `Rprof` and `summaryRprof` for more detailed output
+
+### summaryRprof
+
+`$by.total` - total time
+`$by.self` - time of function subtracting child functions in stack
+
+Note: C or Fortran code not profiled
